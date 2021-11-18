@@ -65,6 +65,10 @@ def do_training(train_data_dir, model_dir, device, image_size, input_size, num_w
 
     num_batches = math.ceil(len(train_dataset) / batch_size)
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
+<<<<<<< HEAD
+=======
+
+>>>>>>> 69b46ec95c1ad47d0be28e82cca11ea931eb2793
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model = EAST()
     model.load_state_dict(torch.load('/opt/ml/code/trained_models/mlt19_bc_mlt17_latest_12_8.pth'))
