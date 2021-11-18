@@ -35,8 +35,6 @@ def parse_args():
     # Conventional args
     parser.add_argument('--train_data_dir', type=str,
                         default='/opt/ml/input/data/ICDAR19')
-    parser.add_argument('--val_data_dir', type=str,
-                        default='/opt/ml/input/data/valid_bc')
     parser.add_argument('--model_dir', type=str, default=os.environ.get('SM_MODEL_DIR',
                                                                         'trained_models'))
     parser.add_argument('--device', default='cuda' if cuda.is_available() else 'cpu')
@@ -57,19 +55,16 @@ def parse_args():
     
 
 
-def do_training(train_data_dir, val_data_dir, model_dir, device, image_size, input_size, num_workers, batch_size,
+def do_training(train_data_dir, model_dir, device, image_size, input_size, num_workers, batch_size,
                 learning_rate, max_epoch, save_interval, seed):
     seed_everything(args.seed)
 
     train_dataset = SceneTextDataset(train_data_dir, split='mlt19_train', image_size=1024, crop_size=512)
-    val_dataset = BoostCampDataset(val_data_dir, image_size=1024, crop_size=512)
 
     train_dataset = EASTDataset(train_dataset)
-    val_dataset = EASTDataset(val_dataset)
 
     num_batches = math.ceil(len(train_dataset) / batch_size)
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
 
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model = EAST()
@@ -110,11 +105,8 @@ def do_training(train_data_dir, val_data_dir, model_dir, device, image_size, inp
         if (epoch + 1) % save_interval == 0:
             if not osp.exists(model_dir):
                 os.makedirs(model_dir)
-
             ckpt_fpath = osp.join(model_dir, f'mlt19_bc_mlt17_latest_12_8_{epoch+1}.pth')
             torch.save(model.state_dict(), ckpt_fpath)
-
-
 
 
 
