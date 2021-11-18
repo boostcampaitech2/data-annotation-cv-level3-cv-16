@@ -14,7 +14,7 @@ from tqdm import tqdm
 import numpy as np
 
 from east_dataset import EASTDataset
-from dataset import SceneTextDataset, BoostCampDataset
+from dataset import SceneTextDataset
 from model import EAST
 import wandb
 from PIL import ImageFile 
@@ -65,7 +65,6 @@ def do_training(train_data_dir, model_dir, device, image_size, input_size, num_w
 
     num_batches = math.ceil(len(train_dataset) / batch_size)
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=num_workers)
-
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     model = EAST()
     model.load_state_dict(torch.load('/opt/ml/code/trained_models/mlt19_bc_mlt17_latest_12_8.pth'))
@@ -88,7 +87,6 @@ def do_training(train_data_dir, model_dir, device, image_size, input_size, num_w
                 optimizer.step()
                 loss_val = loss.item()
                 epoch_loss += loss_val
-
                 pbar.update(1)
                 train_dict = {
                     'Cls loss': extra_info['cls_loss'], 'Angle loss': extra_info['angle_loss'],
